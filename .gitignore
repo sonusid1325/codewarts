@@ -1,0 +1,16 @@
+# Docker compose with secrets — use docker-compose.example.yml as template
+docker-compose.yml
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# SSL Certificates (mounted at runtime)
+nginx/certs/
+
+# OS & Editor
+.DS_Store
+.idea/
+.vscode/
+*.swp

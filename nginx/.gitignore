@@ -1,0 +1,7 @@
+# SSL certificates, keys, and requests
+*.key
+*.crt
+*.pem
+*.csr
+*.cer
+*.p12
