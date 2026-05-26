@@ -1,0 +1,161 @@
+{
+  "family": "codewarts-backend",
+  "taskRoleArn": "arn:aws:iam::148221445428:role/codewarts-ecs-task-execution-role",
+  "executionRoleArn": "arn:aws:iam::148221445428:role/codewarts-ecs-task-execution-role",
+  "networkMode": "awsvpc",
+  "containerDefinitions": [
+    {
+      "name": "db",
+      "image": "postgres:15-alpine",
+      "cpu": 0,
+      "memoryReservation": 128,
+      "essential": true,
+      "environment": [
+        {
+          "name": "POSTGRES_USER",
+          "value": "postgres"
+        },
+        {
+          "name": "POSTGRES_PASSWORD",
+          "value": "postgres"
+        },
+        {
+          "name": "POSTGRES_DB",
+          "value": "learn_linux"
+        }
+      ],
+      "portMappings": [
+        {
+          "containerPort": 5432,
+          "hostPort": 5432,
+          "protocol": "tcp"
+        }
+      ],
+      "mountPoints": [
+        {
+          "sourceVolume": "postgres-data",
+          "containerPath": "/var/lib/postgresql/data"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/codewarts-backend",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "db"
+        }
+      }
+    },
+    {
+      "name": "backend",
+      "image": "148221445428.dkr.ecr.us-east-1.amazonaws.com/codewarts-backend:latest",
+      "cpu": 0,
+      "memoryReservation": 256,
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 8080,
+          "hostPort": 8080,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        {
+          "name": "PORT",
+          "value": "8080"
+        },
+        {
+          "name": "DB_HOST",
+          "value": "127.0.0.1"
+        },
+        {
+          "name": "DB_PORT",
+          "value": "5432"
+        },
+        {
+          "name": "DB_USER",
+          "value": "postgres"
+        },
+        {
+          "name": "DB_PASSWORD",
+          "value": "postgres"
+        },
+        {
+          "name": "DB_NAME",
+          "value": "learn_linux"
+        },
+        {
+          "name": "DB_SSLMODE",
+          "value": "disable"
+        },
+        {
+          "name": "DEV_MODE",
+          "value": "true"
+        },
+        {
+          "name": "JWT_SECRET",
+          "value": "cybersecret_99_key"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "SMTP_HOST",
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:148221445428:secret:codewarts/smtp-GTkgD7:SMTP_HOST::"
+        },
+        {
+          "name": "SMTP_PORT",
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:148221445428:secret:codewarts/smtp-GTkgD7:SMTP_PORT::"
+        },
+        {
+          "name": "SMTP_USER",
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:148221445428:secret:codewarts/smtp-GTkgD7:SMTP_USER::"
+        },
+        {
+          "name": "SMTP_PASS",
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:148221445428:secret:codewarts/smtp-GTkgD7:SMTP_PASS::"
+        },
+        {
+          "name": "SMTP_SENDER",
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:148221445428:secret:codewarts/smtp-GTkgD7:SMTP_SENDER::"
+        },
+        {
+          "name": "BREVO_API_KEY",
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:148221445428:secret:codewarts/smtp-GTkgD7:BREVO_API_KEY::"
+        }
+      ],
+      "mountPoints": [
+        {
+          "sourceVolume": "docker-socket",
+          "containerPath": "/var/run/docker.sock"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/codewarts-backend",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ],
+  "requiresCompatibilities": [
+    "EC2"
+  ],
+  "cpu": "512",
+  "memory": "512",
+  "volumes": [
+    {
+      "name": "docker-socket",
+      "host": {
+        "sourcePath": "/var/run/docker.sock"
+      }
+    },
+    {
+      "name": "postgres-data",
+      "host": {
+        "sourcePath": "/var/lib/codewarts/pgdata"
+      }
+    }
+  ]
+}
