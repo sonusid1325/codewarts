@@ -5,52 +5,10 @@
   "networkMode": "awsvpc",
   "containerDefinitions": [
     {
-      "name": "db",
-      "image": "postgres:15-alpine",
-      "cpu": 0,
-      "memoryReservation": 128,
-      "essential": true,
-      "environment": [
-        {
-          "name": "POSTGRES_USER",
-          "value": "postgres"
-        },
-        {
-          "name": "POSTGRES_PASSWORD",
-          "value": "postgres"
-        },
-        {
-          "name": "POSTGRES_DB",
-          "value": "learn_linux"
-        }
-      ],
-      "portMappings": [
-        {
-          "containerPort": 5432,
-          "hostPort": 5432,
-          "protocol": "tcp"
-        }
-      ],
-      "mountPoints": [
-        {
-          "sourceVolume": "postgres-data",
-          "containerPath": "/var/lib/postgresql/data"
-        }
-      ],
-      "logConfiguration": {
-        "logDriver": "awslogs",
-        "options": {
-          "awslogs-group": "/ecs/codewarts-backend",
-          "awslogs-region": "us-east-1",
-          "awslogs-stream-prefix": "db"
-        }
-      }
-    },
-    {
       "name": "backend",
       "image": "148221445428.dkr.ecr.us-east-1.amazonaws.com/codewarts-backend:latest",
       "cpu": 0,
-      "memoryReservation": 256,
+      "memoryReservation": 384,
       "essential": true,
       "portMappings": [
         {
@@ -65,28 +23,12 @@
           "value": "8080"
         },
         {
-          "name": "DB_HOST",
-          "value": "127.0.0.1"
-        },
-        {
           "name": "DB_PORT",
           "value": "5432"
         },
         {
-          "name": "DB_USER",
-          "value": "postgres"
-        },
-        {
-          "name": "DB_PASSWORD",
-          "value": "postgres"
-        },
-        {
-          "name": "DB_NAME",
-          "value": "learn_linux"
-        },
-        {
           "name": "DB_SSLMODE",
-          "value": "disable"
+          "value": "require"
         },
         {
           "name": "DEV_MODE",
@@ -121,6 +63,22 @@
         {
           "name": "BREVO_API_KEY",
           "valueFrom": "arn:aws:secretsmanager:us-east-1:148221445428:secret:codewarts/smtp-GTkgD7:BREVO_API_KEY::"
+        },
+        {
+          "name": "DB_HOST",
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:148221445428:secret:codewarts/smtp-GTkgD7:DB_HOST::"
+        },
+        {
+          "name": "DB_USER",
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:148221445428:secret:codewarts/smtp-GTkgD7:DB_USER::"
+        },
+        {
+          "name": "DB_PASSWORD",
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:148221445428:secret:codewarts/smtp-GTkgD7:DB_PASSWORD::"
+        },
+        {
+          "name": "DB_NAME",
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:148221445428:secret:codewarts/smtp-GTkgD7:DB_NAME::"
         }
       ],
       "mountPoints": [
@@ -143,18 +101,12 @@
     "EC2"
   ],
   "cpu": "512",
-  "memory": "384",
+  "memory": "512",
   "volumes": [
     {
       "name": "docker-socket",
       "host": {
         "sourcePath": "/var/run/docker.sock"
-      }
-    },
-    {
-      "name": "postgres-data",
-      "host": {
-        "sourcePath": "/var/lib/codewarts/pgdata"
       }
     }
   ]
